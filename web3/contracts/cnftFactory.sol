@@ -11,7 +11,7 @@ contract cnftFactory is Ownable, Pausable{
     uint256 public currentVersion;
     address public lastCreated;
 
-    mapping(uint256 => address) private template;//Version => template
+    mapping(uint256 => address) private template; //Version => template
     
     address[] public allContractAddress;
 

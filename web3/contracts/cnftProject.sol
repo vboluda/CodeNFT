@@ -17,28 +17,20 @@ Initializable,
  ERC721URIStorageUpgradeable
  {
      uint256 nftCounter;
-     address author;
     
-    modifier onlyAuthor(){
-        require(_msgSender() == author , "cnft: not author");
-        _;
-    }
-
     //PROXY FUNCIONS
     
     /**
         Initilizer to susbstiture constructor
         @param _owner of the contract. Will be allowed to upgrade
-        @param _author collection author
         @param _name Name of the NFT collection as stated on ERC-721 standard
         @param _symbol Symbol of the NFT collection as stated on ERC-721 standard
      */
-    function initialize(address _owner, address _author, string memory _name,string memory _symbol) public initializer {
+    function initialize(address _owner, string memory _name,string memory _symbol) public initializer {
         __Ownable_init();
         _transferOwnership(_owner);
         __ERC721_init(_name, _symbol);
         __ERC721URIStorage_init();
-        author=_author;
     }
 
     //END PROXY FUNCTONS
@@ -47,27 +39,10 @@ Initializable,
         Safe mint by the author. It assigns new mitedNFT to the author
         @param uri location of the asset
      */
-    function safeMint(string memory uri) external onlyAuthor {
+    function safeMint(string memory uri) external onlyOwner {
         _safeMint(_msgSender(),uri);
     }
 
-    
-    /**
-        Safe mint by the owner and assign the asset to an address
-        @param to will be the owner of this NFT
-        @param uri location of the asset
-     */
-    function safeMintTo(address to, string memory uri) external onlyOwner {
-        _safeMint(to,uri);
-    }
-
-    /**
-        returns the author od this collection
-        @return addres Address of the author
-     */
-    function getAuthor() public view returns(address){
-        return author;
-    }
 
     /************************************************************
                       INTERNAL FUNCTIONS
@@ -85,5 +60,16 @@ Initializable,
         _setTokenURI(tokenId, uri);
     }
 
-
+    /**
+        Standar restrictor for OpenZeppelin ERC-721 contrat
+        @notice Only miniting operations are allowed
+        @param from must be address(0) to ensure it is a minting operation
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address,
+        uint256
+    ) internal virtual override {
+        require(from==address(0),"CBFT:transfer not allowed");
+    }
 }
