@@ -4,19 +4,26 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable-4.7.3/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable-4.7.3/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable-4.7.3/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable-4.7.3/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable-4.7.3/token/ERC721/IERC721Upgradeable.sol";
 
 /**
     Standard ERC-721 contract with upgradeability capabilities
     @author METAENGIE
  */
-contract ME_NFT is 
+contract cnftProject is 
 Initializable,
- OwnableUpgradeable,
- ERC721URIStorageUpgradeable
- {
-     uint256 nftCounter;
+OwnableUpgradeable,
+IERC721Upgradeable
+{
+    uint256 nftCounter;
+
+    // Token name
+    string public name;
+
+    // Token symbol
+    string public symbol;
+
+    mapping(uint256 => string) public tokenURIs; //
     
     //PROXY FUNCIONS
     
@@ -29,8 +36,8 @@ Initializable,
     function initialize(address _owner, string memory _name,string memory _symbol) public initializer {
         __Ownable_init();
         _transferOwnership(_owner);
-        __ERC721_init(_name, _symbol);
-        __ERC721URIStorage_init();
+        name = _name;
+        symbol = _symbol;
     }
 
     //END PROXY FUNCTONS
@@ -40,8 +47,68 @@ Initializable,
         @param uri location of the asset
      */
     function safeMint(string memory uri) external onlyOwner {
-        _safeMint(_msgSender(),uri);
+        _safeMint(uri);
     }
+
+    // ERC-721 standard functions
+
+
+    function balanceOf(address _owner) external override view returns (uint256 balance){
+        if(_owner == owner()){
+            return nftCounter;
+        }else{
+            return 0;
+        }
+    }
+
+
+    function ownerOf(uint256 tokenId) external override view returns (address _owner){
+        return owner();
+    }
+
+    function safeTransferFrom(address,address,uint256,bytes calldata) external override {
+        revert("CNFT:safeTransferFrom not allowed");
+    }
+
+    function safeTransferFrom(address,address, uint256) external override{
+         revert("CNFT:safeTransferFrom not allowed");
+    }
+
+     function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external override{
+         revert("CNFT:safeTransfer not allowed");
+    }
+
+
+    function approve(address, uint256) external override{
+        revert("CNFT:approve not allowed");
+    }
+
+    function setApprovalForAll(address, bool) external{
+        revert("CNFT:setApprovalForAll not allowed");
+    }
+
+
+    function getApproved(uint256 tokenId) external view returns (address operator){
+        return owner();
+    }
+
+     function isApprovedForAll(address _owner, address operator) external view returns (bool){
+        return (_owner == owner() && operator == owner());
+     }
+
+
+     function supportsInterface(bytes4 interfaceId) external view returns (bool){
+         return
+            interfaceId == type(IERC721Upgradeable).interfaceId ||
+                 interfaceId == type(Initializable).interfaceId ||
+                 interfaceId == type(OwnableUpgradeable).interfaceId;
+
+     }
+
 
 
     /************************************************************
@@ -50,26 +117,12 @@ Initializable,
 
     /**
         Safe mint by the owner and assign the asset to an address
-        @param to will be the owner of this NFT
         @param uri location of the assetº
      */
-    function _safeMint(address to, string memory uri) internal  {
+    function _safeMint(string memory uri) internal  {
         uint256 tokenId = nftCounter;
+        tokenURIs[nftCounter] = uri;
         nftCounter++; // Not safe as nftCounter has 2 pow 256 values it is not necessary additional checks
-        _safeMint(to, tokenId);
-        _setTokenURI(tokenId, uri);
-    }
 
-    /**
-        Standar restrictor for OpenZeppelin ERC-721 contrat
-        @notice Only miniting operations are allowed
-        @param from must be address(0) to ensure it is a minting operation
-     */
-    function _beforeTokenTransfer(
-        address from,
-        address,
-        uint256
-    ) internal virtual override {
-        require(from==address(0),"CBFT:transfer not allowed");
     }
 }
