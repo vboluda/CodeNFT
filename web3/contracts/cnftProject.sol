@@ -16,7 +16,7 @@ OwnableUpgradeable,
 IERC721Upgradeable
 {
     // nftIdentifier counter. It will provide a successively incremented identifier.
-    uint256 nftCounter;
+    uint256 public nftCounter;
 
     // Token name (ERC-721 standard field)
     string public name;
@@ -157,8 +157,9 @@ IERC721Upgradeable
         @param uri location of the assetº
      */
     function _safeMint(string memory uri) internal  {
-        tokenURIs[nftCounter] = uri;
+        uint256 current = nftCounter;
+        tokenURIs[current] = uri;
         nftCounter++; // Not safe as nftCounter has 2 pow 256 values it is not necessary additional checks
-
+        emit Transfer(address(0),owner(),current);
     }
 }
