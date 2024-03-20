@@ -15,15 +15,16 @@ Initializable,
 OwnableUpgradeable,
 IERC721Upgradeable
 {
+    // nftIdentifier counter. It will provide a successively incremented identifier.
     uint256 nftCounter;
 
-    // Token name
+    // Token name (ERC-721 standard field)
     string public name;
 
-    // Token symbol
+    // Token symbol  (ERC-721 standard field)
     string public symbol;
 
-    mapping(uint256 => string) public tokenURIs; //
+    mapping(uint256 => string) public tokenURIs; //identifier -> URI 
     
     //PROXY FUNCIONS
     
@@ -52,7 +53,10 @@ IERC721Upgradeable
 
     // ERC-721 standard functions
 
-
+    /**
+         @inheritdoc IERC721Upgradeable
+         @notice Global owner is the unique Proprietor of the entire collection
+     */
     function balanceOf(address _owner) external override view returns (uint256 balance){
         if(_owner == owner()){
             return nftCounter;
@@ -61,47 +65,80 @@ IERC721Upgradeable
         }
     }
 
-
-    function ownerOf(uint256 tokenId) external override view returns (address _owner){
+    /**
+         @inheritdoc IERC721Upgradeable
+         @notice Global owner is the unique Proprietor of the entire collection
+     */
+    function ownerOf(uint256) external override view returns (address _owner){
         return owner();
     }
 
+     /**
+         @inheritdoc IERC721Upgradeable
+         @notice Disabled
+     */
     function safeTransferFrom(address,address,uint256,bytes calldata) external override {
         revert("CNFT:safeTransferFrom not allowed");
     }
 
+    /**
+         @inheritdoc IERC721Upgradeable
+         @notice Disabled
+     */
     function safeTransferFrom(address,address, uint256) external override{
          revert("CNFT:safeTransferFrom not allowed");
     }
 
-     function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
+    /**
+         @inheritdoc IERC721Upgradeable
+         @notice Disabled
+     */
+    function transferFrom(
+        address,
+        address,
+        uint256
     ) external override{
          revert("CNFT:safeTransfer not allowed");
     }
 
-
+    /**
+         @inheritdoc IERC721Upgradeable
+         @notice Disabled
+     */
     function approve(address, uint256) external override{
         revert("CNFT:approve not allowed");
     }
 
+    /**
+         @inheritdoc IERC721Upgradeable
+         @notice Disabled
+     */
     function setApprovalForAll(address, bool) external{
         revert("CNFT:setApprovalForAll not allowed");
     }
 
 
-    function getApproved(uint256 tokenId) external view returns (address operator){
+    /**
+         @inheritdoc IERC721Upgradeable
+         @notice Disabled
+     */
+    function getApproved(uint256) external view returns (address operator){
         return owner();
     }
 
-     function isApprovedForAll(address _owner, address operator) external view returns (bool){
+    /**
+         @inheritdoc IERC721Upgradeable
+         @notice Disabled
+     */
+    function isApprovedForAll(address _owner, address operator) external view returns (bool){
         return (_owner == owner() && operator == owner());
      }
 
 
-     function supportsInterface(bytes4 interfaceId) external view returns (bool){
+    /**
+         @inheritdoc IERC165Upgradeable
+     */
+    function supportsInterface(bytes4 interfaceId) external view returns (bool){
          return
             interfaceId == type(IERC721Upgradeable).interfaceId ||
                  interfaceId == type(Initializable).interfaceId ||
@@ -120,7 +157,6 @@ IERC721Upgradeable
         @param uri location of the assetº
      */
     function _safeMint(string memory uri) internal  {
-        uint256 tokenId = nftCounter;
         tokenURIs[nftCounter] = uri;
         nftCounter++; // Not safe as nftCounter has 2 pow 256 values it is not necessary additional checks
 
