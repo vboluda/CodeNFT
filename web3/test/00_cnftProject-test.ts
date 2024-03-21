@@ -65,24 +65,25 @@ describe("cnftProject Contract", function () {
     });
 
     describe("CHECK supportsInterface", function () {
-        it("Should return true for the ERC721 interface ID", async function () {
-          expect(await cnftProject.supportsInterface("0x80ac58cd")).to.be.true;
-        });
       
-        it("Should return true for the Initializable interface ID", async function () {
-          expect(await cnftProject.supportsInterface("0x7f5828d0")).to.be.true;
-        });
-      
-        it("Should return true for the OwnableUpgradeable interface ID", async function () {
-          // Replace "0xINTERFACE_ID" with the actual OwnableUpgradeable interface ID
-          expect(await cnftProject.supportsInterface("0x7f5828d0")).to.be.true;
-        });
-      
-        it("Should return false for an unsupported interface ID", async function () {
-          // Using a random interface ID for demonstration; it should be unsupported.
-          expect(await cnftProject.supportsInterface("0x11111111")).to.be.false;
-        });
+      it("Should return true for the ERC721 interface ID", async function () {
+        expect(await cnftProject.supportsInterface("0x80ac58cd")).to.be.true;
       });
+    
+      it("Should return true for the OwnableUpgradeable interface ID", async function () {
+        // Replace "0xINTERFACE_ID" with the actual OwnableUpgradeable interface ID
+        expect(await cnftProject.supportsInterface("0x0e083076")).to.be.true;
+      });
+
+      it("Should return true for the cnfProject interface ID", async function () {
+        expect(await cnftProject.supportsInterface("0x695850fb")).to.be.true;
+      });
+    
+      it("Should return false for an unsupported interface ID", async function () {
+        // Using a random interface ID for demonstration; it should be unsupported.
+        expect(await cnftProject.supportsInterface("0x11111111")).to.be.false;
+      });
+    });
 
     describe("CHECK safeMint", function () {
         it("Should fail when called by not owner", async function () {

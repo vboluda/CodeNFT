@@ -141,12 +141,9 @@ IERC721Upgradeable
     function supportsInterface(bytes4 interfaceId) external view returns (bool){
          return
             interfaceId == type(IERC721Upgradeable).interfaceId ||
-                 interfaceId == type(Initializable).interfaceId ||
-                 interfaceId == type(OwnableUpgradeable).interfaceId;
-
+            interfaceId == type(OwnableUpgradeable).interfaceId ||
+            interfaceId == this.safeMint.selector;
      }
-
-
 
     /************************************************************
                       INTERNAL FUNCTIONS
