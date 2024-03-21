@@ -8,7 +8,8 @@ import "@openzeppelin/contracts-upgradeable-4.7.3/token/ERC721/IERC721Upgradeabl
 
 /**
     Standard ERC-721 contract with upgradeability capabilities
-    @author METAENGIE
+    @notice This is a non transferrable NFT. All NFT minted will have the same owner -> contract's owner
+    @author Vicente Boluda Vias
  */
 contract cnftProject is 
 Initializable,
