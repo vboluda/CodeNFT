@@ -5,8 +5,12 @@ pragma solidity ^0.8.8;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable-4.7.3/utils/introspection/ERC165CheckerUpgradeable.sol";
+import "./cnftProject.sol";
 
 contract cnftFactory is Ownable, Pausable{
+    
+    using ERC165CheckerUpgradeable for address;
 
     uint256 public currentVersion;
     address public lastCreated;
@@ -27,7 +31,15 @@ contract cnftFactory is Ownable, Pausable{
     constructor(address _owner, address _template) Ownable(_owner)
     {
         template[currentVersion] = _template;
-    } 
+    }
+
+     function checkInterfaces(address contractAddress) external view returns (bool) {
+        bool supportsIERC721Upgradeable = contractAddress.supportsInterface(type(IERC721Upgradeable).interfaceId);
+        bool supportsOwnableUpgradeable = contractAddress.supportsInterface(type(OwnableUpgradeable).interfaceId);
+        bool hasSafeMintFunction = contractAddress.supportsInterface(cnftProject.safeMint.selector);
+
+        return supportsIERC721Upgradeable && supportsOwnableUpgradeable && hasSafeMintFunction;
+    }
 
     function allContractAddressLenth() public view returns(uint256){
         return allContractAddress.length;
