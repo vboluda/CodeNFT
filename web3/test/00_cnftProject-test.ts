@@ -64,6 +64,11 @@ describe("cnftProject Contract", function () {
         expect(actualOwner).to.equal(expectedOwner, "The owner is not set correctly after initialization.");
     });
 
+    it("Should no alow a second call to initialize()", async function () {
+      await expect(cnftProject.initialize(otherAddress,"CODE NFT2","CNFT2"))
+      .to.be.revertedWith("Initializable: contract is already initialized");
+    });
+
     describe("CHECK supportsInterface", function () {
       
       it("Should return true for the ERC721 interface ID", async function () {
