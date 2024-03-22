@@ -76,7 +76,7 @@ IERC721Upgradeable
 
      /**
          @inheritdoc IERC721Upgradeable
-         @notice Disabled
+         @notice Disabled as cannot be transferred
      */
     function safeTransferFrom(address,address,uint256,bytes calldata) external override {
         revert("CNFT:safeTransferFrom not allowed");
@@ -84,7 +84,7 @@ IERC721Upgradeable
 
     /**
          @inheritdoc IERC721Upgradeable
-         @notice Disabled
+         @notice Disabled as cannot be transferred
      */
     function safeTransferFrom(address,address, uint256) external override{
          revert("CNFT:safeTransferFrom not allowed");
@@ -92,7 +92,7 @@ IERC721Upgradeable
 
     /**
          @inheritdoc IERC721Upgradeable
-         @notice Disabled
+         @notice Disabled as cannot be transferred
      */
     function transferFrom(
         address,
@@ -104,7 +104,7 @@ IERC721Upgradeable
 
     /**
          @inheritdoc IERC721Upgradeable
-         @notice Disabled
+         @notice Not neeeded as cannot be transferred
      */
     function approve(address, uint256) external override{
         revert("CNFT:approve not allowed");
@@ -112,7 +112,7 @@ IERC721Upgradeable
 
     /**
          @inheritdoc IERC721Upgradeable
-         @notice Disabled
+         @notice Not neeeded as cannot be transferred
      */
     function setApprovalForAll(address, bool) external{
         revert("CNFT:setApprovalForAll not allowed");
@@ -121,7 +121,7 @@ IERC721Upgradeable
 
     /**
          @inheritdoc IERC721Upgradeable
-         @notice Disabled
+         @notice Owner will be the unique approved. Just for compatibitity as NFT cannot be trasferred 
      */
     function getApproved(uint256) external view returns (address operator){
         return owner();
@@ -129,7 +129,7 @@ IERC721Upgradeable
 
     /**
          @inheritdoc IERC721Upgradeable
-         @notice Disabled
+          @notice Owner will be the unique approved. Just for compatibitity as NFT cannot be trasferred 
      */
     function isApprovedForAll(address _owner, address operator) external view returns (bool){
         return (_owner == owner() && operator == owner());
