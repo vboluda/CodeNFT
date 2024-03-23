@@ -30,6 +30,7 @@ contract cnftFactory is Ownable, Pausable{
 
     constructor(address _owner, address _template) Ownable(_owner)
     {
+        require(checkInterfaces(_template), "CBFT: Wrong contract interfaces");
         template[currentVersion] = _template;
     }
 
@@ -76,6 +77,7 @@ contract cnftFactory is Ownable, Pausable{
             "CBFT: Existing version"
         );
         require(_isContract(newTemplate), "CBFT: must be a contract");
+        require(checkInterfaces(_template), "CBFT: Wrong contract interfaces");
         uint256 oldVersion = currentVersion;
         address oldTemplate = template[currentVersion];
         currentVersion = newVersion;
