@@ -14,10 +14,11 @@
   "license": "ISC",
   "devDependencies": {
     "@chainlink/contracts": "^0.8.0",
+    "@nomicfoundation/edr-linux-x64-gnu": "^0.3.2",
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.4",
     "@openzeppelin/contracts": "^5.0.1",
-    "hardhat": "^2.20.1",
+    "hardhat": "^2.22.2",
     "hardhat-deploy": "^0.11.45"
   }
 }
