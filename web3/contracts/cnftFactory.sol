@@ -16,8 +16,6 @@ contract cnftFactory is Ownable, Pausable{
     address public lastCreated;
 
     mapping(uint256 => address) private template; //Version => template
-    
-    address[] public allContractAddress;
 
     event changeTemplateEvent(
         address indexed template,
@@ -34,7 +32,7 @@ contract cnftFactory is Ownable, Pausable{
         template[currentVersion] = _template;
     }
 
-     function checkInterfaces(address contractAddress) external view returns (bool) {
+     function checkInterfaces(address contractAddress) public view returns (bool) {
         bool supportsIERC721Upgradeable = contractAddress.supportsInterface(type(IERC721Upgradeable).interfaceId);
         bool supportsOwnableUpgradeable = contractAddress.supportsInterface(type(OwnableUpgradeable).interfaceId);
         bool hasSafeMintFunction = contractAddress.supportsInterface(cnftProject.safeMint.selector);
@@ -42,11 +40,7 @@ contract cnftFactory is Ownable, Pausable{
         return supportsIERC721Upgradeable && supportsOwnableUpgradeable && hasSafeMintFunction;
     }
 
-    function allContractAddressLenth() public view returns(uint256){
-        return allContractAddress.length;
-    }
-
-    /**
+       /**
     Change version of the template to be clonedsç
     @param newVersion swith to an existing version
     */
@@ -77,7 +71,7 @@ contract cnftFactory is Ownable, Pausable{
             "CBFT: Existing version"
         );
         require(_isContract(newTemplate), "CBFT: must be a contract");
-        require(checkInterfaces(_template), "CBFT: Wrong contract interfaces");
+        require(checkInterfaces(newTemplate), "CBFT: Wrong contract interfaces");
         uint256 oldVersion = currentVersion;
         address oldTemplate = template[currentVersion];
         currentVersion = newVersion;
@@ -103,13 +97,29 @@ contract cnftFactory is Ownable, Pausable{
         Uses clone mechanism to create a new contract from current version template
         @return address new cloned contract address
      */
-    function clone() external whenNotPaused returns(address) {
-        address newContract = Clones.clone(template[currentVersion]);
-        allContractAddress.push(newContract);
-        lastCreated = newContract;
-        emit clonedContractEvent(lastCreated);
-        return newContract;
-    }
+    function clone(string memory _symbol, string memory _projectName) external whenNotPaused returns(address) {
+    // Calculate the hash of _projectName to use as salt
+    bytes32 projectNameHash = keccak256(abi.encodePacked(_projectName));
+
+    // Calculate the deterministic address for the new contract
+    // Assume getDeterministicAddress is a function that returns the address
+    // where the cloned contract would be deployed using the given salt.
+    // This function needs to be implemented according to the logic of your deterministic cloning.
+    address deterministicAddress = Clones.predictDeterministicAddress(template[currentVersion], projectNameHash);
+
+    // Check if there is already code at the calculated address
+    require(!_isContract(deterministicAddress), "CBFT: Contract already exists");
+
+    // Use the deterministic version of the clone function
+    address newContract = Clones.cloneDeterministic(template[currentVersion], projectNameHash);
+
+    lastCreated = newContract;
+
+    emit clonedContractEvent(lastCreated);
+
+    return newContract;
+}
+
 
     function pause() external whenNotPaused{
         _pause();
