@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts-upgradeable-4.7.3/utils/introspection/ERC165CheckerUpgradeable.sol";
 import "./cnftProject.sol";
 
+//import "hardhat/console.sol";
+
 contract cnftFactory is Ownable, Pausable{
     
     using ERC165CheckerUpgradeable for address;
@@ -17,7 +19,7 @@ contract cnftFactory is Ownable, Pausable{
     // Last created contract
     address public lastCreated;
 
-    mapping(uint256 => address) private template; //Version => template
+    mapping(uint256 => address) public template; //Version => template
 
     event changeTemplateEvent(
         address indexed template,
@@ -113,7 +115,7 @@ contract cnftFactory is Ownable, Pausable{
         @return address new cloned contract address
      */
     function clone(string memory _symbol, string memory _projectName) external whenNotPaused returns(address) {
-    // Calculate the hash of _projectName to use as salt
+        // Calculate the hash of _projectName to use as salt
         bytes32 projectNameHash = keccak256(abi.encodePacked(_projectName));
 
         // Calculate the deterministic address for the new contract
@@ -171,8 +173,6 @@ contract cnftFactory is Ownable, Pausable{
         address deterministicAddress = Clones.predictDeterministicAddress(template[currentVersion], projectNameHash);
         return deterministicAddress;
     }
-
-
 
     /***************************************************
                 INTERNAL FUNCTIONS

@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable-4.7.3/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable-4.7.3/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable-4.7.3/token/ERC721/IERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable-4.7.3/utils/introspection/IERC165Upgradeable.sol";
 
 /**
     Standard ERC-721 contract with upgradeability capabilities
@@ -141,6 +142,7 @@ IERC721Upgradeable
      */
     function supportsInterface(bytes4 interfaceId) external view returns (bool){
          return
+            interfaceId == type(IERC165Upgradeable).interfaceId ||
             interfaceId == type(IERC721Upgradeable).interfaceId ||
             interfaceId == type(OwnableUpgradeable).interfaceId ||
             interfaceId == this.safeMint.selector;
