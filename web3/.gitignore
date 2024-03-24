@@ -1,5 +1,7 @@
+# Typescript files
 package-lock.json
 node_modules
+
 .env
 
 # Hardhat files
