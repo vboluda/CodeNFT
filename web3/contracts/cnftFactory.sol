@@ -41,7 +41,7 @@ contract cnftFactory is Ownable, Pausable{
      */
     constructor(address _owner, address _template) Ownable(_owner)
     {
-        require(checkInterfaces(_template), "CBFT: Wrong contract interfaces");
+        require(checkInterfaces(_template), "CNFT: Wrong contract interfaces");
         template[currentVersion] = _template;
     }
 
@@ -61,10 +61,10 @@ contract cnftFactory is Ownable, Pausable{
         @notice Contract must imoplemnt the IERC721Upgradeable and OwnableUpgradeable interfaces        
         @param newVersion swith to an existing version
     */
-    function changeTemplateVersion(uint256 newVersion) external onlyOwner{
+    function changeTemplateVersion(uint256 newVersion) external onlyOwner whenNotPaused{
         require(
             template[newVersion] != address(0) && newVersion != currentVersion,
-            "CBFT:Wrong version"
+            "CNFT:Wrong version"
         );
         uint256 oldVersion = currentVersion;
         address oldTemplate = template[currentVersion];
@@ -82,13 +82,13 @@ contract cnftFactory is Ownable, Pausable{
         @param newVersion Template version
         @param newTemplate new template asociated with previous version
      */
-    function changeTemplate(uint256 newVersion,address newTemplate) external onlyOwner{
+    function changeTemplate(uint256 newVersion,address newTemplate) external onlyOwner whenNotPaused{
         require(
             template[newVersion] == address(0) ,
-            "CBFT: Unexisting version"
+            "CNFT: Existing version"
         );
-        require(_isContract(newTemplate), "CBFT: must be a contract");
-        require(checkInterfaces(newTemplate), "CBFT: Wrong contract interfaces");
+        require(_isContract(newTemplate), "CNFT: must be a contract");
+        require(checkInterfaces(newTemplate), "CNFT: Wrong contract interfaces");
         uint256 oldVersion = currentVersion;
         address oldTemplate = template[currentVersion];
         currentVersion = newVersion;
@@ -125,7 +125,7 @@ contract cnftFactory is Ownable, Pausable{
         address deterministicAddress = Clones.predictDeterministicAddress(template[currentVersion], projectNameHash);
 
         // Check if there is already code at the calculated address
-        require(!_isContract(deterministicAddress), "CBFT: Contract already exists");
+        require(!_isContract(deterministicAddress), "CNFT: Contract already exists");
 
         // Use the deterministic version of the clone function
         address newContract = Clones.cloneDeterministic(template[currentVersion], projectNameHash);
