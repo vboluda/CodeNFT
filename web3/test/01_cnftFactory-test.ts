@@ -26,7 +26,7 @@ describe("cnftFactory Contract", function () {
     let cnftProject__factory:CnftProject__factory;
     let cnftProject:CnftProject;
 
-    async function deployFixture(ownerAddress:string):Promise<[CnftFactory,CnftProject,CnftProject__factory]>{
+    async function deployFixture():Promise<[CnftFactory,CnftProject,CnftProject__factory]>{
 
       [Deployer,Owner,Other] = await ethers.getSigners();
 
@@ -53,7 +53,7 @@ describe("cnftFactory Contract", function () {
 
     this.beforeEach(async function () {
 
-        [cnftFactory, cnftProject,cnftProject__factory] = await deployFixture(ownerAddress);
+        [cnftFactory, cnftProject,cnftProject__factory] = await deployFixture();
     });
 
     it("Should include correct field values after initialization", async function () {
@@ -69,9 +69,90 @@ describe("cnftFactory Contract", function () {
       expect(actualOwner).to.equal(actualOwner, "The owner is not set correctly after initialization.");
     });
 
+    it("Should prevent to set an incorrect contract when constructor is called", async function () {
+      const factoryAux:CnftFactory__factory = await ethers.getContractFactory("cnftFactory") as CnftFactory__factory;
+      
+      await expect(factoryAux.deploy(ownerAddress, otherAddress))
+      .to.be.revertedWith("CNFT: must be a contract");
+
+      await expect(factoryAux.deploy(ownerAddress, await cnftFactory.getAddress()))
+      .to.be.revertedWith("CNFT: Wrong contract interfaces");
+    });
+
+    describe("Pause function", function () {
+      it("Should allow only the owner to pause the contract", async function () {
+
+          // The owner pauses the contract
+          await expect(cnftFactory.connect(Owner).pause())
+              .to.emit(cnftFactory, 'Paused')
+              .withArgs(ownerAddress);
+  
+          // Verifies that the contract is paused
+          expect(await cnftFactory.paused()).to.be.true;
+      });
+
+      it("Should prevent to pause when paused", async function () {
+
+        // The owner pauses the contract
+        await expect(cnftFactory.connect(Owner).pause())
+            .to.emit(cnftFactory, 'Paused')
+            .withArgs(ownerAddress);
+
+          await expect(cnftFactory.connect(Owner).pause())
+          .to.be.revertedWithCustomError(cnftFactory, "EnforcedPause");
+    });
+  
+      it("Should prevent non-owners from pausing the contract", async function () {
+          // A non-owner attempts to pause the contract
+          await expect(cnftFactory.connect(Other).pause())
+              .to.be.revertedWithCustomError(cnftFactory, 'OwnableUnauthorizedAccount')
+              .withArgs(otherAddress);
+      });
+  
+      it("Should allow only the owner to unpause the contract", async function () {
+          // First, the owner pauses the contract
+          await cnftFactory.connect(Owner).pause();
+  
+          // Then, the owner unpauses the contract
+          await expect(cnftFactory.connect(Owner).unPause())
+              .to.emit(cnftFactory, 'Unpaused')
+              .withArgs(ownerAddress);
+  
+          // Verifies that the contract is not paused anymore
+          expect(await cnftFactory.paused()).to.be.false;
+      });
+
+      it("Should prevent to unpause when unpaused", async function () {
+
+          await expect(cnftFactory.connect(Owner).unPause())
+          .to.be.revertedWithCustomError(cnftFactory, "ExpectedPause");
+    });
+  
+      it("Should prevent non-owners from unpausing the contract", async function () {
+          // First, the owner pauses the contract
+          await cnftFactory.connect(Owner).pause();
+  
+          // A non-owner attempts to unpause the contract
+          await expect(cnftFactory.connect(Other).unPause())
+              .to.be.revertedWithCustomError(cnftFactory, 'OwnableUnauthorizedAccount')
+              .withArgs(otherAddress);
+      });
+  
+      it("Should prevent executing certain actions while paused", async function () {
+          // The owner pauses the contract
+          await cnftFactory.connect(Owner).pause();
+  
+          // Attempts to perform an action that should be restricted while paused
+          await expect(cnftFactory.connect(Owner).clone("SYM", "ProjectName"))
+              .to.be.revertedWithCustomError(cnftFactory, "EnforcedPause");
+      });
+    });
+  
+
     describe("Update template function", function () {
   
       it("Should prevent non-owners from changing the template version", async function () {
+
           const newVersion = 1;
           // Expect revert when a non-owner tries to change the template version
           await expect(cnftFactory.connect(Other).changeTemplateVersion(newVersion))
@@ -102,6 +183,9 @@ describe("cnftFactory Contract", function () {
 
         await expect(cnftFactory.connect(Owner).changeTemplate(newVersion+1, cnftFactory))
         .to.be.revertedWith("CNFT: Wrong contract interfaces");
+
+        await expect(cnftFactory.connect(Owner).changeTemplate(newVersion, newTemplate))
+        .to.be.revertedWith("CNFT: Existing version");
       });
   
       it("Should prevent non-owners from changing the template", async function () {
@@ -220,6 +304,6 @@ describe("cnftFactory Contract", function () {
         await expect(cnftFactory.connect(Owner).clone(symbol, projectName))
             .to.be.revertedWithCustomError(cnftFactory, "EnforcedPause");
     });
-});
+  });
 
 });

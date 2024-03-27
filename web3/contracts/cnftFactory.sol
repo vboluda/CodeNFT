@@ -41,6 +41,7 @@ contract cnftFactory is Ownable, Pausable{
      */
     constructor(address _owner, address _template) Ownable(_owner)
     {
+        require(_isContract(_template), "CNFT: must be a contract");
         require(checkInterfaces(_template), "CNFT: Wrong contract interfaces");
         template[currentVersion] = _template;
     }
