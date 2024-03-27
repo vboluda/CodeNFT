@@ -176,7 +176,50 @@ describe("cnftFactory Contract", function () {
       // Change the template
       await expect(cnftFactory.connect(Owner).changeTemplate(newVersion, newTemplate))
       .to.be.revertedWithCustomError(cnftFactory,"EnforcedPause")
-
     });
-  }); 
+  });
+
+  describe("Clone function", function () {
+    let projectName = "TestProject";
+    let symbol = "TST";
+
+    it("Should allow cloning a new project contract", async function () {
+
+      let deterministicAddress:string = await cnftFactory.locateContractAddress(projectName);
+
+        // Clone the project
+        await expect(cnftFactory.connect(Owner).clone(symbol, projectName))
+            .to.emit(cnftFactory, "clonedContractEvent")
+            .withArgs(
+                deterministicAddress,
+                0,
+                await cnftFactory.getCurrentTemplate(),
+                projectName
+            );
+
+        // Verify that the contract was indeed created
+        const newProjectAddress = await cnftFactory.locateContractAddressByVersion(projectName,0);
+        expect(newProjectAddress).to.properAddress;
+        expect(await ethers.provider.getCode(newProjectAddress)).to.not.equal('0x');
+    });
+
+    it("Should fail to clone a project with the same name", async function () {
+        // First clone
+        await cnftFactory.connect(Owner).clone(symbol, projectName);
+
+        // Attempt to clone again with the same project name
+        await expect(cnftFactory.connect(Owner).clone(symbol, projectName))
+            .to.be.revertedWith("CNFT: Contract already exists");
+    });
+
+    it("Should fail to clone when the factory is paused", async function () {
+        // Pause the factory
+        await cnftFactory.connect(Owner).pause();
+
+        // Attempt to clone a project
+        await expect(cnftFactory.connect(Owner).clone(symbol, projectName))
+            .to.be.revertedWithCustomError(cnftFactory, "EnforcedPause");
+    });
+});
+
 });

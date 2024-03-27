@@ -157,7 +157,7 @@ contract cnftFactory is Ownable, Pausable{
         @param _version version of the template that has created the contract
         @return address contract address
     */
-    function locateContractAddress(string memory _projectName,uint256 _version) public view returns(address){
+    function locateContractAddressByVersion(string memory _projectName,uint256 _version) public view returns(address){
         bytes32 projectNameHash = keccak256(abi.encodePacked(_projectName));
         address deterministicAddress = Clones.predictDeterministicAddress(template[_version], projectNameHash);
         return deterministicAddress;
