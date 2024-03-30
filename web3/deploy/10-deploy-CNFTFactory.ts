@@ -11,11 +11,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   let config:any=configHardhat.CNFT;
 
 
-let treasuryAddress:string = (await deployments.get('cnftProject')).address;
+let templateAddress:string = (await deployments.get('cnftProject')).address;
  
   const ARGS:any[]=[
     config.owner,
-    treasuryAddress
+    templateAddress
   ];
   //console.log("Parameters: "+JSON.stringify(ARGS));
   let deployResult:any = await deploy('cnftFactory', {
