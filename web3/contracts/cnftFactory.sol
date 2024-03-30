@@ -117,7 +117,7 @@ contract cnftFactory is Ownable, Pausable{
      */
     function clone(string memory _symbol, string memory _projectName) external whenNotPaused returns(address) {
         // Calculate the hash of _projectName to use as salt
-        bytes32 projectNameHash = keccak256(abi.encodePacked(_projectName));
+        bytes32 projectNameHash = keccak256(abi.encodePacked(_msgSender(), _projectName));
 
         // Calculate the deterministic address for the new contract
         // Assume getDeterministicAddress is a function that returns the address
@@ -158,8 +158,8 @@ contract cnftFactory is Ownable, Pausable{
         @param _version version of the template that has created the contract
         @return address contract address
     */
-    function locateContractAddressByVersion(string memory _projectName,uint256 _version) public view returns(address){
-        bytes32 projectNameHash = keccak256(abi.encodePacked(_projectName));
+    function locateContractAddressByVersion(address projectOwner, string memory _projectName,uint256 _version) public view returns(address){
+        bytes32 projectNameHash = keccak256(abi.encodePacked(projectOwner, _projectName));
         address deterministicAddress = Clones.predictDeterministicAddress(template[_version], projectNameHash);
         return deterministicAddress;
     }
@@ -169,8 +169,8 @@ contract cnftFactory is Ownable, Pausable{
         @param _projectName project name
         @return address contract address
     */
-    function locateContractAddress(string memory _projectName) public view returns(address){
-        bytes32 projectNameHash = keccak256(abi.encodePacked(_projectName));
+    function locateContractAddress(address projectOwner,string memory _projectName) public view returns(address){
+        bytes32 projectNameHash = keccak256(abi.encodePacked(projectOwner,_projectName));
         address deterministicAddress = Clones.predictDeterministicAddress(template[currentVersion], projectNameHash);
         return deterministicAddress;
     }

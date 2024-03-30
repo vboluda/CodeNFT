@@ -15,11 +15,13 @@ describe("cnftFactory Contract", function () {
     let Deployer:Signer;
     let Owner:Signer;
     let Other:Signer;
+    let ProjectOwner:Signer;
 
     // Signer addresses
     let deployerAddress:string;
     let ownerAddress:string;
     let otherAddress:string;
+    let projectOwnerAddress:string;
 
     // Contract
     let cnftFactory:CnftFactory;
@@ -28,16 +30,18 @@ describe("cnftFactory Contract", function () {
 
     async function deployFixture():Promise<[CnftFactory,CnftProject,CnftProject__factory]>{
 
-      [Deployer,Owner,Other] = await ethers.getSigners();
+      [Deployer,Owner,Other, ProjectOwner] = await ethers.getSigners();
 
       [
           deployerAddress, 
           ownerAddress,
-          otherAddress
+          otherAddress,
+          projectOwnerAddress
       ] = await Promise.all([
           Deployer.getAddress(),
           Owner.getAddress(),
-          Other.getAddress()
+          Other.getAddress(),
+          ProjectOwner.getAddress()
       ]);
 
       let [cnftFactory_Factory,cnftProject__factory] = await Promise.all([
@@ -269,10 +273,10 @@ describe("cnftFactory Contract", function () {
 
     it("Should allow cloning a new project contract", async function () {
 
-      let deterministicAddress:string = await cnftFactory.locateContractAddress(projectName);
+      let deterministicAddress:string = await cnftFactory.locateContractAddress(projectOwnerAddress, projectName);
 
         // Clone the project
-        await expect(cnftFactory.connect(Owner).clone(symbol, projectName))
+        await expect(cnftFactory.connect(ProjectOwner).clone(symbol, projectName))
             .to.emit(cnftFactory, "clonedContractEvent")
             .withArgs(
                 deterministicAddress,
@@ -282,7 +286,7 @@ describe("cnftFactory Contract", function () {
             );
 
         // Verify that the contract was indeed created
-        const newProjectAddress = await cnftFactory.locateContractAddressByVersion(projectName,0);
+        const newProjectAddress = await cnftFactory.locateContractAddressByVersion(projectOwnerAddress, projectName,0);
         expect(newProjectAddress).to.properAddress;
         expect(await ethers.provider.getCode(newProjectAddress)).to.not.equal('0x');
     });
