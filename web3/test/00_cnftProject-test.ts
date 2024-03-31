@@ -64,7 +64,7 @@ describe("cnftProject Contract", function () {
         expect(actualOwner).to.equal(expectedOwner, "The owner is not set correctly after initialization.");
     });
 
-    it("Should no alow a second call to initialize()", async function () {
+    it("Should no allow a second call to initialize()", async function () {
       await expect(cnftProject.initialize(otherAddress,"CODE NFT2","CNFT2"))
       .to.be.revertedWith("Initializable: contract is already initialized");
     });
@@ -127,6 +127,12 @@ describe("cnftProject Contract", function () {
 
             const otherAmount = await cnftProject.balanceOf(otherAddress);
             expect(otherAmount).to.equal(0n, "New other amount for other is not correct");
+
+            const nftowner:string = await cnftProject.ownerOf(TOKENID);
+            expect(nftowner).to.equal(ownerAddress, "New owner of token is not correct");
+
+            const unexistent_nftowner:string = await cnftProject.ownerOf(TOKENID + 1n);
+            expect(unexistent_nftowner).to.equal(ZERO_ADDRESS, "New owner of token is not correct");
         });
     });
       

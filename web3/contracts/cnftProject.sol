@@ -71,7 +71,10 @@ IERC721Upgradeable
          @inheritdoc IERC721Upgradeable
          @notice Global owner is the unique Proprietor of the entire collection
      */
-    function ownerOf(uint256) external override view returns (address _owner){
+    function ownerOf(uint256 id) external override view returns (address _owner){
+        if(id >= nftCounter){
+            return address(0);
+        }
         return owner();
     }
 
