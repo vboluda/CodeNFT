@@ -1,0 +1,19 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Output of the Go coverage tool
+*.out
+
+# Dependency directories (remove -` if you're using go modules)
+/vendor/
+Gopkg.lock
+go.sum
+
+# Project-specific
+bin/
+obj/
