@@ -1,4 +1,4 @@
-module ipfs-uploader
+module github.com/vboluda/CodeNFT/back/ipfs-uploader
 
 go 1.20
 
