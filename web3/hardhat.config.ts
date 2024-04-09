@@ -53,7 +53,16 @@ const config: HardhatUserConfig = {
         owner: "0xfB692f53a8bE8E43bAcb89c90dF51199eBe23eAd",
         VERIFY:true
       }
-    },  
+    },
+    miroll: {
+      url: "https://condorglen-rpc.eu-north-2.gateway.fm",
+      accounts: [`${process.env.DEV_PK_MIROLL}`],
+      chainId: 315476595,
+      CNFT:{
+        owner: "0xfB692f53a8bE8E43bAcb89c90dF51199eBe23eAd",
+        VERIFY:false
+      }
+    },    
   }
 };
 
