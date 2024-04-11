@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"github.com/vboluda/CodeNFT/back/ipfs-uploader/ipfsuploader"
 )
 
 // Response structure to send back to the client
@@ -56,6 +57,7 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/upload", uploadFileHandler)
+	fmt.Println(ipfsuploader.ToUpper("Server started on port 8080"))
 
 	// Start the server on port 8080
 	log.Fatal(http.ListenAndServe(":8080", nil))
